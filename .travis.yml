@@ -16,4 +16,4 @@ jdk:
   - openjdk8
 
 script:
-  - bundle exec rake build
+  - ./gradlew build
