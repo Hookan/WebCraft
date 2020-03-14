@@ -1,6 +1,6 @@
 language: java
+
 os:
-  - windows
   - linux
 
 before_cache:
@@ -14,3 +14,6 @@ cache:
 
 jdk:
   - openjdk8
+
+script:
+  - bundle exec rake build
