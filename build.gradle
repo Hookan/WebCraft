@@ -1,0 +1,181 @@
+buildscript {
+    repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+    }
+}
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+apply plugin: 'cpp'
+
+String mod_version = '0.1'
+version = System.getenv("BUILD_NUMBER") != null ? mod_version + "." + System.getenv("BUILD_NUMBER") : mod_version
+group = 'cafe.qwq'
+archivesBaseName = 'webcraft'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+
+minecraft {
+    mappings channel: 'snapshot', version: '20200306-1.15.1'
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                webcraft {
+                    source sourceSets.main
+                }
+                webcraftdemo {
+                    source sourceSets.test
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                webcraft {
+                    source sourceSets.main
+                }
+                webcraftdemo {
+                    source sourceSets.test
+                }
+            }
+        }
+    }
+}
+
+model {
+    platforms {
+        x64 {
+            architecture 'x64'
+        }
+    }
+
+    components {
+        webcraft_core(NativeLibrarySpec) {
+            targetPlatform "x64"
+            binaries.all {
+                if (targetPlatform.operatingSystem.macOsX) {
+                    cppCompiler.args '-O2'
+                    cppCompiler.args '-std=c++11'
+                    cppCompiler.args '-I', "${project.projectDir}/cpplibs/include"
+                    cppCompiler.args '-I', "${org.gradle.internal.jvm.Jvm.current().javaHome}/include"
+                    cppCompiler.args '-I', "${org.gradle.internal.jvm.Jvm.current().javaHome}/include/darwin"
+                    linker.args '-Wl,-rpath,@loader_path'
+                    linker.args "-L${project.projectDir}/cpplibs/mac"
+                    linker.args '-lWebCore'
+                    linker.args '-lUltralightCore'
+                    linker.args '-lUltralight'
+                } else if (targetPlatform.operatingSystem.linux) {
+                    cppCompiler.args '-O2'
+                    cppCompiler.args '-std=c++11'
+                    cppCompiler.args '-I', "${project.projectDir}/cpplibs/include"
+                    cppCompiler.args '-I', "${org.gradle.internal.jvm.Jvm.current().javaHome}/include"
+                    cppCompiler.args '-I', "${org.gradle.internal.jvm.Jvm.current().javaHome}/include/linux"
+                    cppCompiler.args '-D_FILE_OFFSET_BITS=64'
+                    linker.args '-Wl,-rpath=$ORIGIN'
+                    linker.args "-L${project.projectDir}/cpplibs/linux"
+                    linker.args '-lWebCore'
+                    linker.args '-lUltralightCore'
+                    linker.args '-lUltralight'
+                } else if (targetPlatform.operatingSystem.windows) {//Use MSVC to compile
+                    cppCompiler.args '/O2'
+                    cppCompiler.args '/LDd', '/MDd'
+                    cppCompiler.args '/std:c++14'
+                    cppCompiler.args "/I${project.projectDir}/cpplibs/include"
+                    cppCompiler.args "/I${org.gradle.internal.jvm.Jvm.current().javaHome}/include"
+                    cppCompiler.args "/I${org.gradle.internal.jvm.Jvm.current().javaHome}/include/win32"
+                    cppCompiler.args '/EHsc', '/GS-', '/fp:fast'
+                    linker.args '/MANIFEST', '/MACHINE:x64'
+                    linker.args '/DYNAMICBASE'
+                    linker.args "${project.projectDir}/cpplibs/win/Ultralight.lib"
+                    linker.args "${project.projectDir}/cpplibs/win/UltralightCore.lib"
+                    linker.args "${project.projectDir}/cpplibs/win/WebCore.lib"
+                }
+            }
+
+            sources {
+                cpp {
+                    source {
+                        srcDirs "src/main/cpp"
+                        include "**/*.cpp" , "**/*.h" , "**/*.c"
+                    }
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.15.2-31.1.0'
+}
+
+def reobfFile = file("${buildDir}/reobfJar/output.jar")
+def reobfArtifact = artifacts.add('default', reobfFile) {
+    type 'jar'
+    builtBy 'reobfJar'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact reobfArtifact
+        }
+    }
+    repositories {
+        maven {
+            url "file:///${project.projectDir}/mcmodsrepo"
+        }
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title": 'webcraft',
+                "Specification-Vendor": 'bogos',
+                "Specification-Version": '1',
+                "Implementation-Title": project.name,
+                "Implementation-Version": "${version}",
+                "Implementation-Vendor" :'bogos',
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+compileJava.dependsOn('webcraft_coreSharedLibrary')
+
+compileJava << {
+    copy {
+        if(System.getProperty("os.name").equals('Linux'))
+        {
+            from "${project.projectDir}/cpplibs/linux"
+        }
+        else if(System.getProperty("os.name").toLowerCase().contains("win"))
+        {
+            from("${project.projectDir}/cpplibs/win") {
+                exclude '*.lib'
+            }
+        }
+        else
+        {
+            from "${project.projectDir}/cpplibs/mac"
+        }
+        into "${buildDir}/libs/webcraft_core/shared"
+    }
+    copy {
+        from "${buildDir}/libs/webcraft_core/shared"
+        into "${project.projectDir}/run/mods/webcraft/natives"
+    }
+}

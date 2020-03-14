@@ -1,0 +1,23 @@
+modLoader="javafml" #mandatory
+loaderVersion="[31,)"
+[[mods]]
+modId="webcraft"
+version="${file.jarVersion}"
+displayName="WebCraft"
+credits="Bogos"
+authors="hookan"
+description='''
+A GUI API for modders to use HTML/JS/CSS to write GUIs.
+'''
+[[dependencies.webcraft]]
+    modId="forge"
+    mandatory=true
+    versionRange="[31,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.webcraft]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.15.2]"
+    ordering="NONE"
+    side="BOTH"

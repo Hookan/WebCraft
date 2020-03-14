@@ -1,0 +1,22 @@
+modLoader="javafml" #mandatory
+loaderVersion="[31,)"
+[[mods]]
+modId="demo"
+version="${file.jarVersion}"
+displayName="WebCraftDemo"
+credits="Bogos"
+authors="hookan"
+description='''
+'''
+[[dependencies.webcraft]]
+    modId="forge"
+    mandatory=true
+    versionRange="[31,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.webcraft]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.15.2]"
+    ordering="NONE"
+    side="BOTH"
