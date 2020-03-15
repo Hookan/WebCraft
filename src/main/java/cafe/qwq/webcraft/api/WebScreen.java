@@ -85,14 +85,12 @@ public class WebScreen extends Screen
 
     public boolean charTyped(char codePoint, int modifiers)
     {
-        System.out.println("CHAR TYPED " + (int) codePoint + " " + modifiers + "  " + codePoint);
         viewList.forEach(view -> view.fireKeyEvent(3, 0, Character.toString(codePoint), 0, 0));
         return true;
     }
 
     public boolean keyPressed(int keyCode, int scanCode, int modifiers)
     {
-        //System.out.println("KEY PRESSED " + keyCode+" "+scanCode + " " + modifiers);
         int uKeyCode = KeyboardHelper.glfwKeyCodeToUltralightKeyCode(keyCode);
         int uModifiers = KeyboardHelper.glfwModsToUltralightMods(modifiers);
         viewList.forEach(view -> view.fireKeyEvent(2, uModifiers, null, scanCode, uKeyCode));
@@ -105,7 +103,6 @@ public class WebScreen extends Screen
 
     public boolean keyReleased(int keyCode, int scanCode, int modifiers)
     {
-        //System.out.println("KEY PRESSED " + keyCode+" "+scanCode + " " + modifiers);
         int uKeyCode = KeyboardHelper.glfwKeyCodeToUltralightKeyCode(keyCode);
         int uModifiers = KeyboardHelper.glfwModsToUltralightMods(modifiers);
         viewList.forEach(view -> view.fireKeyEvent(1, uModifiers, null, scanCode, uKeyCode));

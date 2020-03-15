@@ -6,6 +6,12 @@ import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Scanner;
+
 @Mod(WebCraft.MODID)
 public class WebCraft
 {
@@ -25,6 +31,7 @@ public class WebCraft
                 .forEach(info -> VERSION = MavenVersionStringHelper.artifactVersionToString(info.getVersion()));
         if (VERSION.equals("NULL")) LOGGER.warn("WebCraft got version failed !");
         else LOGGER.info("Welcome to use WebCraft (version:" + VERSION + ") ! ");
+        Config.init();
     }
 
     public enum OS

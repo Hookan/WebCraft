@@ -13,10 +13,10 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'cpp'
 
-String mod_version = '0.1'
-version = System.getenv("BUILD_NUMBER") != null ? mod_version + "." + System.getenv("BUILD_NUMBER") : mod_version
+version = '0.2'
 group = 'cafe.qwq'
 archivesBaseName = 'webcraft'
+
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
@@ -121,21 +121,65 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.15.2-31.1.0'
 }
 
+task apiJar(type: Jar) {
+    from sourceSets.main.output
+    manifest {
+        attributes([
+                "Specification-Title": 'webcraft',
+                "Specification-Vendor": 'bogos',
+                "Specification-Version": '1',
+                "Implementation-Title": project.name,
+                "Implementation-Version": "${version}",
+                "Implementation-Vendor" :'bogos',
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task nativesJar(type: Jar) {
+    if(System.getProperty("os.name").toLowerCase().contains('linux'))
+    {
+        classifier = 'natives-linux'
+        from "${buildDir}/libs/webcraft_core/shared"
+    }
+    else if(System.getProperty("os.name").toLowerCase().contains("win"))
+    {
+        classifier = 'natives-win'
+        from("${buildDir}/libs/webcraft_core/shared") {
+            include '*.dll'
+        }
+    }
+    else
+    {
+        classifier = 'natives-mac'
+        from "${buildDir}/libs/webcraft_core/shared"
+    }
+}
+
 def reobfFile = file("${buildDir}/reobfJar/output.jar")
 def reobfArtifact = artifacts.add('default', reobfFile) {
     type 'jar'
     builtBy 'reobfJar'
+    classifier = 'runtime'
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifact apiJar
+            artifact sourcesJar
+            artifact nativesJar
             artifact reobfArtifact
         }
     }
     repositories {
         maven {
-            url "file:///${project.projectDir}/mcmodsrepo"
+            url 'file:///' + System.getenv('NATIVE_MAVEN_PATH')
         }
     }
 }
@@ -158,7 +202,7 @@ compileJava.dependsOn('webcraft_coreSharedLibrary')
 
 compileJava << {
     copy {
-        if(System.getProperty("os.name").equals('Linux'))
+        if(System.getProperty("os.name").toLowerCase().contains('linux'))
         {
             from "${project.projectDir}/cpplibs/linux"
         }
