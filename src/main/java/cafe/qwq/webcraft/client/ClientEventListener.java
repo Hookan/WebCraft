@@ -1,5 +1,6 @@
 package cafe.qwq.webcraft.client;
 
+import cafe.qwq.webcraft.Config;
 import cafe.qwq.webcraft.WebCraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -11,6 +12,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.lwjgl.glfw.GLFW;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -101,7 +104,7 @@ public class ClientEventListener
         {
             URL url = new URL(urlstr);
             File outputFile = new File("mods/webcraft/" + fileName);
-            //if (Config.getInstance().downloadNativesSilently)
+            if (Config.getInstance().downloadNativesSilently)
             {
                 URLConnection connection = url.openConnection();
                 InputStream input = connection.getInputStream();
@@ -127,6 +130,62 @@ public class ClientEventListener
                 WebCraft.LOGGER.info(String.format("Downloading natives(%.2fKB/%.2fKB %.2fKB/s)...", sum / 1024f, size, sum2 / (1.024f * (time - lastTime))));
                 input.close();
                 output.close();
+            }
+            else
+            {
+                System.setProperty("java.awt.headless", "false");
+                JFrame frame = new JFrame();
+                JPanel panel = new JPanel();
+                panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+                frame.setContentPane(panel);
+                frame.setTitle("WebCraft");
+                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                int width = 800;
+                int height = 70;
+                int x = (screenSize.width - width) / 2;
+                int y = (screenSize.height - height) / 2;
+                frame.setBounds(x, y, width, height);
+                frame.setAlwaysOnTop(true);
+                frame.setResizable(false);
+                frame.setUndecorated(true);
+                frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                panel.setBackground(Color.WHITE);
+                JLabel label = new JLabel("Downloading natives...");
+                label.setFont(new Font("Arial", Font.PLAIN, 16));
+                panel.add(label);
+                JProgressBar bar = new JProgressBar();
+                panel.add(bar);
+                frame.setVisible(true);
+                URLConnection connection = url.openConnection();
+                InputStream input = connection.getInputStream();
+                OutputStream output = new FileOutputStream(outputFile);
+                float size = connection.getContentLength();
+                bar.setMaximum((int) size);
+                size /= 1024f * 1024f;
+                int length, sum = 0, sum2 = 0;
+                byte[] bytes = new byte[1024];
+                long lastTime = System.currentTimeMillis();
+                while ((length = input.read(bytes)) != -1)
+                {
+                    output.write(bytes, 0, length);
+                    sum += length;
+                    sum2 += length;
+                    long time = System.currentTimeMillis();
+                    if (time - lastTime >= 1000)
+                    {
+                        String info = String.format("Downloading natives(%.2fMB/%.2fMB %.2fMB/s)...", sum / 1024f / 1024f, size, sum2 / (1.024f * 1024f * (time - lastTime)));
+                        WebCraft.LOGGER.info(info);
+                        label.setText(info);
+                        bar.setValue(sum);
+                        sum2 = 0;
+                        lastTime = time;
+                    }
+                }
+                long time = System.currentTimeMillis();
+                WebCraft.LOGGER.info(String.format("Downloading natives(%.2fMB/%.2fMB %.2fMB/s)...", sum / 1024f, size, sum2 / (1.024f * 1024f * (time - lastTime))));
+                input.close();
+                output.close();
+                frame.dispose();
             }
             ZipFile zip = new ZipFile(outputFile);
             File libDir = new File(libPath);

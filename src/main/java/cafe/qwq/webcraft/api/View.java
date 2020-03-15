@@ -11,7 +11,7 @@ import java.net.URL;
 
 public class View
 {
-    private Vec4i location;
+    private Vec4i bounds;
     private final long viewPointer;
     private final boolean isTransparent;
     private IResizeCallback resizeCallback;
@@ -39,7 +39,7 @@ public class View
      */
     public View(Vec4i vec, boolean isTransparent)
     {
-        location = vec;
+        bounds = vec;
         this.isTransparent = isTransparent;
         viewPointer = WebRenderer.INSTANCE.createView(vec.w, vec.h, isTransparent);
     }
@@ -57,16 +57,16 @@ public class View
      */
     public Vec4i getLocation()
     {
-        return location;
+        return bounds;
     }
 
     /**
      * 设置view的坐标以及长宽
      */
-    public void setLocation(Vec4i location)
+    public void setBounds(Vec4i bounds)
     {
-        this.location = location;
-        resize(viewPointer, location.w, location.h);
+        this.bounds = bounds;
+        resize(viewPointer, bounds.w, bounds.h);
     }
 
     /**
@@ -79,7 +79,7 @@ public class View
 
     void onResize(Vec2i vec)
     {
-        if (resizeCallback != null) setLocation(resizeCallback.onResize(vec));
+        if (resizeCallback != null) setBounds(resizeCallback.onResize(vec));
     }
 
     public void loadHTML(String html)
@@ -115,10 +115,10 @@ public class View
         RenderSystem.enableAlphaTest();
         RenderSystem.enableBlend();
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
-        bufferbuilder.pos(location.x, location.y, 0.0).tex(l, t).endVertex();
-        bufferbuilder.pos(location.x + location.w, location.y, 0.0).tex(r, t).endVertex();
-        bufferbuilder.pos(location.x + location.w, location.y + location.h, 0.0).tex(r, b).endVertex();
-        bufferbuilder.pos(location.x, location.y + location.h, 0.0).tex(l, b).endVertex();
+        bufferbuilder.pos(bounds.x, bounds.y, 0.0).tex(l, t).endVertex();
+        bufferbuilder.pos(bounds.x + bounds.w, bounds.y, 0.0).tex(r, t).endVertex();
+        bufferbuilder.pos(bounds.x + bounds.w, bounds.y + bounds.h, 0.0).tex(r, b).endVertex();
+        bufferbuilder.pos(bounds.x, bounds.y + bounds.h, 0.0).tex(l, b).endVertex();
         tessellator.draw();
         RenderSystem.enableLighting();
         RenderSystem.disableAlphaTest();

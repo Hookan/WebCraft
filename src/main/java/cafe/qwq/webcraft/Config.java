@@ -14,7 +14,7 @@ public class Config
     private static Config instance;
     private static final String CONFIG_FILE_PATH = "mods/webcraft/config.json";
     
-    //public boolean downloadNativesSilently = false;
+    public boolean downloadNativesSilently = false;
     
     public static void init()
     {
