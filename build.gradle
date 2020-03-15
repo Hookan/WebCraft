@@ -91,7 +91,7 @@ model {
                     linker.args '-lUltralight'
                 } else if (targetPlatform.operatingSystem.windows) {//Use MSVC to compile
                     cppCompiler.args '/O2'
-                    cppCompiler.args '/LDd', '/MDd'
+                    cppCompiler.args '/LD', '/MD'
                     cppCompiler.args '/std:c++14'
                     cppCompiler.args "/I${project.projectDir}/cpplibs/include"
                     cppCompiler.args "/I${org.gradle.internal.jvm.Jvm.current().javaHome}/include"
@@ -142,20 +142,15 @@ task sourcesJar(type: Jar) {
 }
 
 task nativesJar(type: Jar) {
-    if(System.getProperty("os.name").toLowerCase().contains('linux'))
-    {
+    if(System.getProperty("os.name").toLowerCase().contains('linux')) {
         classifier = 'natives-linux'
         from "${buildDir}/libs/webcraft_core/shared"
-    }
-    else if(System.getProperty("os.name").toLowerCase().contains("win"))
-    {
+    } else if(System.getProperty("os.name").toLowerCase().contains("win")) {
         classifier = 'natives-win'
         from("${buildDir}/libs/webcraft_core/shared") {
             include '*.dll'
         }
-    }
-    else
-    {
+    } else {
         classifier = 'natives-mac'
         from "${buildDir}/libs/webcraft_core/shared"
     }
@@ -202,18 +197,15 @@ compileJava.dependsOn('webcraft_coreSharedLibrary')
 
 compileJava << {
     copy {
-        if(System.getProperty("os.name").toLowerCase().contains('linux'))
-        {
+        if(System.getProperty("os.name").toLowerCase().contains('linux')) {
             from "${project.projectDir}/cpplibs/linux"
         }
-        else if(System.getProperty("os.name").toLowerCase().contains("win"))
-        {
+        else if(System.getProperty("os.name").toLowerCase().contains("win")) {
             from("${project.projectDir}/cpplibs/win") {
                 exclude '*.lib'
             }
         }
-        else
-        {
+        else {
             from "${project.projectDir}/cpplibs/mac"
         }
         into "${buildDir}/libs/webcraft_core/shared"

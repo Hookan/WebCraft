@@ -12,7 +12,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod("demo")
-@Mod.EventBusSubscriber(modid = "demo", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class Demo
 {
     public Demo()
@@ -20,7 +19,6 @@ public class Demo
         MinecraftForge.EVENT_BUS.addListener(Demo::onGUiOpen);
     }
     
-    @SubscribeEvent
     public static void onGUiOpen(final GuiOpenEvent event)
     {
         if (event.getGui() instanceof WorldSelectionScreen)
