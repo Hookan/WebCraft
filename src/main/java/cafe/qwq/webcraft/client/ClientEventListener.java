@@ -73,14 +73,19 @@ public class ClientEventListener
     {
         File f = new File(libPath);
         if (!f.exists() || !f.isDirectory()) return false;
+
         File f1 = new File(getNativePath("UltralightCore"));
         if (!f1.exists() || !f1.isFile()) return false;
+
         f1 = new File(getNativePath("WebCore"));
         if (!f1.exists() || !f1.isFile()) return false;
+
         f1 = new File(getNativePath("Ultralight"));
         if (!f1.exists() || !f1.isFile()) return false;
+
         f1 = new File(getNativePath("webcraft_core"));
         if (!f1.exists() || !f1.isFile()) return false;
+
         return true;
     }
     
@@ -99,6 +104,7 @@ public class ClientEventListener
                 fileName += "-mac.jar";//虽然并没有MAC版本
                 break;
         }
+
         String urlstr = MAVEN_URL + "cafe/qwq/webcraft/" + WebCraft.VERSION + "/" + fileName;
         try
         {
@@ -113,6 +119,7 @@ public class ClientEventListener
                 int length, sum = 0, sum2 = 0;
                 byte[] bytes = new byte[1024];
                 long lastTime = System.currentTimeMillis();
+
                 while ((length = input.read(bytes)) != -1)
                 {
                     output.write(bytes, 0, length);
@@ -126,16 +133,20 @@ public class ClientEventListener
                         lastTime = time;
                     }
                 }
+
                 long time = System.currentTimeMillis();
                 WebCraft.LOGGER.info(String.format("Downloading natives(%.2fKB/%.2fKB %.2fKB/s)...", sum / 1024f, size, sum2 / (1.024f * (time - lastTime))));
+
                 input.close();
                 output.close();
             }
             else
             {
                 System.setProperty("java.awt.headless", "false");
+
                 JFrame frame = new JFrame();
                 JPanel panel = new JPanel();
+
                 panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
                 frame.setContentPane(panel);
                 frame.setTitle("WebCraft");
@@ -149,6 +160,7 @@ public class ClientEventListener
                 frame.setResizable(false);
                 frame.setUndecorated(true);
                 frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
                 panel.setBackground(Color.WHITE);
                 JLabel label = new JLabel("Downloading natives...");
                 label.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -156,6 +168,7 @@ public class ClientEventListener
                 JProgressBar bar = new JProgressBar();
                 panel.add(bar);
                 frame.setVisible(true);
+
                 URLConnection connection = url.openConnection();
                 InputStream input = connection.getInputStream();
                 OutputStream output = new FileOutputStream(outputFile);
@@ -165,6 +178,7 @@ public class ClientEventListener
                 int length, sum = 0, sum2 = 0;
                 byte[] bytes = new byte[1024];
                 long lastTime = System.currentTimeMillis();
+
                 while ((length = input.read(bytes)) != -1)
                 {
                     output.write(bytes, 0, length);
@@ -181,8 +195,10 @@ public class ClientEventListener
                         lastTime = time;
                     }
                 }
+
                 long time = System.currentTimeMillis();
                 WebCraft.LOGGER.info(String.format("Downloading natives(%.2fMB/%.2fMB %.2fMB/s)...", sum / 1024f, size, sum2 / (1.024f * 1024f * (time - lastTime))));
+
                 input.close();
                 output.close();
                 frame.dispose();

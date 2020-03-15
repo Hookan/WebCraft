@@ -57,27 +57,27 @@ public class WebScreen extends Screen
 
     public boolean mouseClicked(double mouseX, double mouseY, int buttonID)
     {
-        viewList.forEach(view -> view.fireMouseEvent(1, buttonID, (int) mouseX - view.getLocation().x, (int) mouseY - view.getLocation().y));
+        viewList.forEach(view -> view.fireMouseEvent(1, buttonID, (int) mouseX - view.getBounds().x, (int) mouseY - view.getBounds().y));
         return true;
     }
 
     public boolean mouseReleased(double mouseX, double mouseY, int buttonID)
     {
-        viewList.forEach(view -> view.fireMouseEvent(2, buttonID, (int) mouseX - view.getLocation().x, (int) mouseY - view.getLocation().y));
+        viewList.forEach(view -> view.fireMouseEvent(2, buttonID, (int) mouseX - view.getBounds().x, (int) mouseY - view.getBounds().y));
         return true;
     }
 
     public void mouseMoved(double mouseX, double mouseY)
     {
-        viewList.forEach(view -> view.fireMouseEvent(0, 0, (int) (mouseX - view.getLocation().x), (int) (mouseY - view.getLocation().y)));
+        viewList.forEach(view -> view.fireMouseEvent(0, 0, (int) (mouseX - view.getBounds().x), (int) (mouseY - view.getBounds().y)));
     }
 
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta)
     {
         for (View view : viewList)
         {
-            Vec4i l = view.getLocation();
-            if (l.x <= mouseX && l.x + l.w >= mouseX && l.y <= mouseY && l.y + l.h >= mouseY)
+            Vec4i vec = view.getBounds();
+            if (vec.x <= mouseX && vec.x + vec.w >= mouseX && vec.y <= mouseY && vec.y + vec.h >= mouseY)
                 view.fireScrollEvent((int) (scrollDelta * 25));
         }
         return true;

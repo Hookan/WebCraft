@@ -55,7 +55,7 @@ public class View
     /**
      * @return view的位置信息
      */
-    public Vec4i getLocation()
+    public Vec4i getBounds()
     {
         return bounds;
     }

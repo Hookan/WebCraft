@@ -13,22 +13,27 @@ public class WebCraft
     public static String VERSION = "NULL";
     public static final Logger LOGGER = LogManager.getLogger();
     public static OS RUNTIME_OS;
-    
+
     public WebCraft()
     {
         String osName = System.getProperty("os.name").toLowerCase();
-        if (osName.contains("win")) RUNTIME_OS = OS.WINDOWS;
-        else if (osName.contains("linux")) RUNTIME_OS = OS.LINUX;
-        else RUNTIME_OS = OS.MAC;
+        if (osName.contains("win"))
+            RUNTIME_OS = OS.WINDOWS;
+        else if (osName.contains("linux"))
+            RUNTIME_OS = OS.LINUX;
+        else
+            RUNTIME_OS = OS.MAC;
+
         ModList.get().getMods().stream()
                 .filter(info -> info.getModId().equals(MODID))
                 .forEach(info -> VERSION = MavenVersionStringHelper.artifactVersionToString(info.getVersion()));
-        VERSION = "0.2";
+
         if (VERSION.equals("NULL")) LOGGER.warn("WebCraft got version failed !");
         else LOGGER.info("Welcome to use WebCraft (version:" + VERSION + ") ! ");
+
         Config.init();
     }
-    
+
     public enum OS
     {
         WINDOWS, MAC, LINUX
