@@ -14,18 +14,58 @@ public class WebScreen extends Screen
 {
     private List<View> viewList;
     private boolean shouldCloseOnEsc;
+    private List<IRenderer> rendererList1;
+    private List<IRenderer> rendererList2;
 
     public WebScreen(ITextComponent component)
     {
         super(component);
         viewList = new LinkedList<>();
+        rendererList1 = new LinkedList<>();
+        rendererList2 = new LinkedList<>();
         shouldCloseOnEsc = true;
     }
 
+    /**
+     * 添加一个网页View
+     */
     public WebScreen addView(View view)
     {
         viewList.add(view);
         return this;
+    }
+
+    /**
+     * 设置当按下Esc键时是否关闭GUI
+     */
+    public WebScreen setShouldCloseOnEsc(boolean shouldCloseOnEsc)
+    {
+        this.shouldCloseOnEsc = shouldCloseOnEsc;
+        return this;
+    }
+
+    /**
+     * 添加一个Renderer可以在网页渲染前渲染自己的东西
+     */
+    public WebScreen addPreRenderer(IRenderer renderer)
+    {
+        rendererList1.add(renderer);
+        return this;
+    }
+
+    /**
+     * 添加一个Renderer可以在网页渲染后渲染自己的东西
+     */
+    public WebScreen addPostRenderer(IRenderer renderer)
+    {
+        rendererList2.add(renderer);
+        return this;
+    }
+
+    public void setSize(int w, int h)
+    {
+        super.setSize(w, h);
+        viewList.forEach(view -> view.onResize(new Vec2i(w, h)));
     }
 
     protected void init()
@@ -42,17 +82,6 @@ public class WebScreen extends Screen
     public boolean shouldCloseOnEsc()
     {
         return shouldCloseOnEsc;
-    }
-
-    public void setShouldCloseOnEsc(boolean shouldCloseOnEsc)
-    {
-        this.shouldCloseOnEsc = shouldCloseOnEsc;
-    }
-
-    public void setSize(int w, int h)
-    {
-        super.setSize(w, h);
-        viewList.forEach(view -> view.onResize(new Vec2i(w, h)));
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int buttonID)
@@ -115,8 +144,12 @@ public class WebScreen extends Screen
     public void render(int mouseX, int mouseY, float pTicks)
     {
         WebRenderer.INSTANCE.offscreenRender();
-        renderBackground();
+        //renderBackground();
+
+        rendererList1.forEach(renderer -> renderer.render(mouseX, mouseY, pTicks));
         viewList.forEach(view -> view.draw());
+        rendererList2.forEach(renderer -> renderer.render(mouseX, mouseY, pTicks));
+
         fpsSum++;
         double time = GLFW.glfwGetTime();
         if (time - lastTime > 1.0)

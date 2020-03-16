@@ -13,7 +13,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'cpp'
 
-version = '0.3.1'
+version = '0.3.2'
 group = 'cafe.qwq'
 archivesBaseName = 'webcraft'
 
@@ -142,6 +142,7 @@ task sourcesJar(type: Jar) {
 }
 
 task nativesJar(type: Jar) {
+    dependsOn 'compileJava'
     if(System.getProperty("os.name").toLowerCase().contains('linux')) {
         classifier = 'natives-linux'
         from "${buildDir}/libs/webcraft_core/shared"

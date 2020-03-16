@@ -2,11 +2,14 @@ package cafe.qwq.webcraft.api;
 
 import cafe.qwq.webcraft.api.math.Vec2i;
 import cafe.qwq.webcraft.api.math.Vec4i;
+import cafe.qwq.webcraft.util.FileUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.ResourceLocation;
 
+import java.io.IOException;
 import java.net.URL;
 
 public class View
@@ -63,18 +66,20 @@ public class View
     /**
      * 设置view的坐标以及长宽
      */
-    public void setBounds(Vec4i bounds)
+    public View setBounds(Vec4i bounds)
     {
         this.bounds = bounds;
         resize(viewPointer, bounds.w, bounds.h);
+        return this;
     }
 
     /**
      * 设置WebScreen窗口大小改变时的回调函数
      */
-    public void setResizeCallback(IResizeCallback callback)
+    public View setResizeCallback(IResizeCallback callback)
     {
         resizeCallback = callback;
+        return this;
     }
 
     void onResize(Vec2i vec)
@@ -82,19 +87,32 @@ public class View
         if (resizeCallback != null) setBounds(resizeCallback.onResize(vec));
     }
 
-    public void loadHTML(String html)
+    public View loadHTML(String html)
     {
         nloadHTML(viewPointer, html);
+        return this;
     }
 
-    public void loadURL(URL url)
+    public View loadHTML(ResourceLocation location) throws IOException
+    {
+        String path = "/assets/" + location.getNamespace() + "/web/" + location.getPath();
+        FileUtils.upzipIfNeeded(path);
+        String url = "file:///" + System.getProperty("user.dir") + "/mods/webcraft" + path;
+        loadURL(url);
+        return this;
+    }
+
+    public View loadURL(URL url)
     {
         loadURL(url.toString());
+        return this;
     }
 
-    public void loadURL(String url)
+    public View loadURL(String url)
     {
+        System.out.println(url);
         nloadURL(viewPointer, url);
+        return this;
     }
 
     /**

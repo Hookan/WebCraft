@@ -2,6 +2,7 @@ package cafe.qwq.webcraft.client;
 
 import cafe.qwq.webcraft.Config;
 import cafe.qwq.webcraft.WebCraft;
+import cafe.qwq.webcraft.util.FileUtils;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -19,7 +20,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.function.Consumer;
 import java.util.zip.ZipFile;
 
@@ -31,7 +31,7 @@ public class ClientEventListener
     private static final String MAVEN_URL = "https://maven.qwq.cafe/";
     //private static final String MAVEN_URL = "file:///E:/mod/hookan.github.io/";
     private static String libPath;
-    
+
     static
     {
         if (!WebCraft.VERSION.equals("NONE") && !WebCraft.VERSION.equals("NULL"))
@@ -40,17 +40,17 @@ public class ClientEventListener
             if (!checkNatives()) downloadNatives();
         }
         else libPath = "mods/webcraft/natives/";
-        
+
         if (WebCraft.RUNTIME_OS == WebCraft.OS.WINDOWS)
         {
             loadLibrary("UltralightCore");
             loadLibrary("WebCore");
             loadLibrary("Ultralight");
         }
-        
+
         loadLibrary("webcraft_core");
     }
-    
+
     private static String getNativePath(String name)
     {
         String name1;
@@ -68,7 +68,7 @@ public class ClientEventListener
         }
         return libPath + name1;
     }
-    
+
     private static boolean checkNatives()
     {
         File f = new File(libPath);
@@ -88,7 +88,7 @@ public class ClientEventListener
 
         return true;
     }
-    
+
     private static void downloadNatives()
     {
         String fileName = "webcraft-" + WebCraft.VERSION + "-natives";
@@ -112,33 +112,7 @@ public class ClientEventListener
             File outputFile = new File("mods/webcraft/" + fileName);
             if (Config.getInstance().downloadNativesSilently)
             {
-                URLConnection connection = url.openConnection();
-                InputStream input = connection.getInputStream();
-                OutputStream output = new FileOutputStream(outputFile);
-                float size = connection.getContentLength() / 1024f;
-                int length, sum = 0, sum2 = 0;
-                byte[] bytes = new byte[1024];
-                long lastTime = System.currentTimeMillis();
-
-                while ((length = input.read(bytes)) != -1)
-                {
-                    output.write(bytes, 0, length);
-                    sum += length;
-                    sum2 += length;
-                    long time = System.currentTimeMillis();
-                    if (time - lastTime >= 1000)
-                    {
-                        WebCraft.LOGGER.info(String.format("Downloading natives(%.2fKB/%.2fKB %.2fKB/s)...", sum / 1024f, size, sum2 / (1.024f * (time - lastTime))));
-                        sum2 = 0;
-                        lastTime = time;
-                    }
-                }
-
-                long time = System.currentTimeMillis();
-                WebCraft.LOGGER.info(String.format("Downloading natives(%.2fKB/%.2fKB %.2fKB/s)...", sum / 1024f, size, sum2 / (1.024f * (time - lastTime))));
-
-                input.close();
-                output.close();
+                FileUtils.downloadFile(url, outputFile, null);
             }
             else
             {
@@ -162,45 +136,18 @@ public class ClientEventListener
                 frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
                 panel.setBackground(Color.WHITE);
-                JLabel label = new JLabel("Downloading natives...");
+                JLabel label = new JLabel("Downloading " + fileName + "...");
                 label.setFont(new Font("Arial", Font.PLAIN, 16));
                 panel.add(label);
                 JProgressBar bar = new JProgressBar();
                 panel.add(bar);
                 frame.setVisible(true);
 
-                URLConnection connection = url.openConnection();
-                InputStream input = connection.getInputStream();
-                OutputStream output = new FileOutputStream(outputFile);
-                float size = connection.getContentLength();
-                bar.setMaximum((int) size);
-                size /= 1024f * 1024f;
-                int length, sum = 0, sum2 = 0;
-                byte[] bytes = new byte[1024];
-                long lastTime = System.currentTimeMillis();
+                final String finalFileName = fileName;
+                FileUtils.downloadFile(url, outputFile, (size, downloadSize, speed) -> {
+                    label.setText(String.format("Downloading %s(%.2fMB/%.2fMB %.2fMB/s)...", finalFileName, downloadSize / 1024f, size / 1024f, speed / 1024f));
+                });
 
-                while ((length = input.read(bytes)) != -1)
-                {
-                    output.write(bytes, 0, length);
-                    sum += length;
-                    sum2 += length;
-                    long time = System.currentTimeMillis();
-                    if (time - lastTime >= 1000)
-                    {
-                        String info = String.format("Downloading natives(%.2fMB/%.2fMB %.2fMB/s)...", sum / 1024f / 1024f, size, sum2 / (1.024f * 1024f * (time - lastTime)));
-                        WebCraft.LOGGER.info(info);
-                        label.setText(info);
-                        bar.setValue(sum);
-                        sum2 = 0;
-                        lastTime = time;
-                    }
-                }
-
-                long time = System.currentTimeMillis();
-                WebCraft.LOGGER.info(String.format("Downloading natives(%.2fMB/%.2fMB %.2fMB/s)...", sum / 1024f, size, sum2 / (1.024f * 1024f * (time - lastTime))));
-
-                input.close();
-                output.close();
                 frame.dispose();
             }
             ZipFile zip = new ZipFile(outputFile);
@@ -234,13 +181,13 @@ public class ClientEventListener
             e.printStackTrace();
         }
     }
-    
+
     private static void loadLibrary(String name)
     {
         File f = new File(getNativePath(name));
         System.load(f.getAbsolutePath());
     }
-    
+
     @SubscribeEvent
     public static void onClientSetup(final FMLClientSetupEvent event)
     {
@@ -248,15 +195,19 @@ public class ClientEventListener
         MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST, consumer);
         //WCShaders.init();
     }
-    
+
     public static void onTick(final TickEvent.RenderTickEvent event)
     {
         MinecraftForge.EVENT_BUS.unregister(consumer);
         UltralightWindow.init();
         UltralightWindow.getInstance().makeCurrent();
-        nativeInit(GLFW.Functions.GetProcAddress, GLFW.Functions.GetTime);
+        Config config = Config.getInstance();
+        long configPointer = setNativeConfig(config.fontFamilyStandard, config.fontFamilyFixed, config.fontFamilySerif, config.fontFamilySansSerif, config.userAgent);
+        nativeInit(GLFW.Functions.GetProcAddress, GLFW.Functions.GetTime, configPointer);
         UltralightWindow.getInstance().unmakeCurrent();
     }
-    
-    private native static void nativeInit(long pointer1, long pointer2);
+
+    private native static long setNativeConfig(String fontFamilyStandard, String fontFamilyFixed, String fontFamilySerif, String fontFamilySansSerif, String userAgent);
+
+    private native static void nativeInit(long pointer1, long pointer2, long pointer3);
 }
