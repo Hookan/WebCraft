@@ -130,7 +130,7 @@ minecraft {
 
 //添加的地方（1）
 repositories {
-    maven { url 'file:///E:/mod/1.15.2/WebCraft/mcmodsrepo' }
+    maven { url 'https://maven.qwq.cafe' }
 }
 
 dependencies {
