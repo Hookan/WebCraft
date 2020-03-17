@@ -149,9 +149,10 @@ def reobfArtifact = artifacts.add('default', reobfFile) {
     classifier 'runtime'
 }
 
-task apiJar(type: Jar, dependsOn: 'classes') {
+task devJar(type: Jar, dependsOn: 'classes') {
     from "${buildDir}/classes/java/main/"
     from "${buildDir}/resources/main"
+    classifier 'dev'
     manifest {
         attributes([
                 "Specification-Title": 'webcraft',
@@ -190,7 +191,7 @@ task demoJar(type: Jar, dependsOn: 'test') {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact apiJar
+            artifact devJar
             artifact sourcesJar
             artifact nativesJar
             artifact reobfArtifact

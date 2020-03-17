@@ -43,14 +43,16 @@ API文档正在编写中
 
 另外，对于Windows用户，还需要安装[VC++运行库](https://aka.ms/vs/16/release/vc_redist.x64.exe)
 
-由于本mod在首次运行时会下载natives，又因为本mod采用单线程下载，速度较慢，你可以顺便下载对应版本对应系统的natives（jar文件名中包含了`natives`和`win`或者`linux`），然后再将其解压到`mods/webcraft/natives-<verion>`（需要将`<version>`替换成你所安装的WebCraft版本（不是MC/Forge版本））
+由于本mod在首次运行时会下载natives，又因为本mod采用单线程下载，速度较慢，你可以顺便下载对应版本对应系统的natives（jar文件名中包含了`natives`和`win`或者`linux`），然后再将其解压到`mods/webcraft/natives-<webcraft_verion>`（需要将`<webcraft_version>`替换成你所安装的WebCraft版本（不是MC或者Forge版本））
 
 
 ## 如何构建附属mod的开发环境
 
+注：以下全部`<webcraft_version>`需要替换成你想要的WebCraft版本
+
 下载forge mdk后，把mappings修改为`mappings channel: 'snapshot', version: '20200306-1.15.1'`
 
-（如果你想要任意mappings，接下来的`implementation 'cafe.qwq:webcraft:0.3.3'`可以修改为`implementation fg.deobf('cafe.qwq:webcraft:0.3.3:runtime')`）
+（如果你想要任意mappings，接下来的`implementation 'cafe.qwq:webcraft:<webcraft_version>:dev'`可以修改为`implementation fg.deobf('cafe.qwq:webcraft:<webcraft_version>:runtime')`）
 
 然后添加以下代码
 
@@ -60,7 +62,7 @@ repositories {
 }
 ```
 
-再在`dependencies`添加`implementation 'cafe.qwq:webcraft:0.3.3'`
+再在`dependencies`添加`implementation 'cafe.qwq:webcraft:<webcraft_version>:dev'`
 
 完整的build.gradle示范
 ```groovy
@@ -149,9 +151,9 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.15.2-31.1.0'
     //添加的地方（2）
-    implementation 'cafe.qwq:webcraft:0.3.3'
+    implementation 'cafe.qwq:webcraft:<webcraft_version>:dev'
     //如果你想要自己定mappings请写下面注释这段
-    //implementation fg.deobf('cafe.qwq:webcraft:0.3.3:runtime')
+    //implementation fg.deobf('cafe.qwq:webcraft:<webcraft_version>:runtime')
 }
 
 jar {
@@ -193,7 +195,7 @@ publishing {
 [[dependencies.modid]] # 请修改成你的modid
     modId="webcraft"
     mandatory=true
-    versionRange="[0.3.3]"
+    versionRange="[<webcraft_version>]"
     ordering="NONE"
     side="BOTH" # 未来WebCraft会有一些服务端的API
 ```
