@@ -48,9 +48,9 @@ API文档正在编写中
 
 ## 如何构建附属mod的开发环境
 
-* 方案1（如果你懒得折腾，对mcp的方法名无所谓的话，你可以参照这个方法）
-
 下载forge mdk后，把mappings修改为`mappings channel: 'snapshot', version: '20200306-1.15.1'`
+
+（如果你想要任意mappings，接下来的`implementation 'cafe.qwq:webcraft:0.3.3'`可以修改为`implementation fg.deobf('cafe.qwq:webcraft:0.3.3:runtime')`）
 
 然后添加以下代码
 
@@ -60,7 +60,7 @@ repositories {
 }
 ```
 
-再在`dependencies`添加`implementation 'cafe.qwq:webcraft:0.3.2'`
+再在`dependencies`添加`implementation 'cafe.qwq:webcraft:0.3.3'`
 
 完整的build.gradle示范
 ```groovy
@@ -149,7 +149,9 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.15.2-31.1.0'
     //添加的地方（2）
-    implementation 'cafe.qwq:webcraft:0.3.2'
+    implementation 'cafe.qwq:webcraft:0.3.3'
+    //如果你想要自己定mappings请写下面注释这段
+    //implementation fg.deobf('cafe.qwq:webcraft:0.3.3:runtime')
 }
 
 jar {
@@ -191,16 +193,10 @@ publishing {
 [[dependencies.modid]] # 请修改成你的modid
     modId="webcraft"
     mandatory=true
-    versionRange="[0.3.2]"
+    versionRange="[0.3.3]"
     ordering="NONE"
     side="BOTH" # 未来WebCraft会有一些服务端的API
 ```
-
-* 方案2（你可以自由的选择你mod的mcp mappings）
-
-首先到[https://maven.qwq.cafe/cafe/qwq/webcraft/0.3.2/webcraft-0.3.2-runtime.jar](https://maven.qwq.cafe/cafe/qwq/webcraft/0.3.2/webcraft-0.3.2-runtime.jar)下载运行环境的WebCraft
-
-然后参考[ustc-zzzz的教程](https://fmltutor.ustc-zzzz.net/3.5.1-%E4%BD%BF%E7%94%A8%E5%85%B6%E4%BB%96Mod%E7%9A%84API.html)来生成一份你想要的mappings的WebCraft并引用
 
 ## 如何构建本mod的开发环境
 

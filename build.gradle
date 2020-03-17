@@ -121,28 +121,12 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.15.2-31.1.0'
 }
 
-task apiJar(type: Jar) {
-    from sourceSets.main.output
-    manifest {
-        attributes([
-                "Specification-Title": 'webcraft',
-                "Specification-Vendor": 'bogos',
-                "Specification-Version": '1',
-                "Implementation-Title": project.name,
-                "Implementation-Version": "${version}",
-                "Implementation-Vendor" :'bogos',
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
-}
-
 task sourcesJar(type: Jar) {
-    classifier = 'sources'
+    classifier 'sources'
     from sourceSets.main.allSource
 }
 
-task nativesJar(type: Jar) {
-    dependsOn 'compileJava'
+task nativesJar(type: Jar, dependsOn: 'compileJava') {
     if(System.getProperty("os.name").toLowerCase().contains('linux')) {
         classifier = 'natives-linux'
         from "${buildDir}/libs/webcraft_core/shared"
@@ -161,7 +145,44 @@ def reobfFile = file("${buildDir}/reobfJar/output.jar")
 def reobfArtifact = artifacts.add('default', reobfFile) {
     type 'jar'
     builtBy 'reobfJar'
-    classifier = 'runtime'
+    classifier 'runtime'
+}
+
+task apiJar(type: Jar, dependsOn: 'jar') {
+    from "${buildDir}/classes/java/main/"
+    manifest {
+        attributes([
+                "Specification-Title": 'webcraft',
+                "Specification-Vendor": 'bogos',
+                "Specification-Version": '1',
+                "Implementation-Title": project.name,
+                "Implementation-Version": "${version}",
+                "Implementation-Vendor" :'bogos',
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: 'javadoc') {
+    from "${buildDir}/docs/javadoc"
+    classifier 'javadoc'
+}
+
+task demoJar(type: Jar, dependsOn: 'test') {
+    from "${buildDir}/classes/java/test/"
+    from "${buildDir}/resources/test"
+    classifier 'demo'
+    manifest {
+        attributes([
+                "Specification-Title": 'demo',
+                "Specification-Vendor": 'bogos',
+                "Specification-Version": '1',
+                "Implementation-Title": project.name,
+                "Implementation-Version": "${version}",
+                "Implementation-Vendor" :'bogos',
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
 }
 
 publishing {
@@ -171,6 +192,8 @@ publishing {
             artifact sourcesJar
             artifact nativesJar
             artifact reobfArtifact
+            artifact javadocJar
+            artifact demoJar
         }
     }
     repositories {
