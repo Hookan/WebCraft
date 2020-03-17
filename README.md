@@ -1,6 +1,6 @@
 # WebCraft
 
-这是一个基于Minecraft Forge的GUI API（本mod还在开发中）
+这是一个基于Minecraft Forge的GUI API（本mod还在开发中，目前是MC1.15.2的mod）
 
 主要功能是可以使用HTML/CSS/JS来进行GUI的编写
 
@@ -15,12 +15,25 @@
 API文档正在编写中
 
 
-## TODO List:
+## TODO List
+
+0.4版本：
 
 * JavaScript与Java的交互
 * 事件系统
+
+正式版本：
+
 * 和背包/格子/TileEntity的配套使用
 * API详细使用文档
+
+未来计划：
+
+* 提供一些和服务器插件交互的API
+* 开发Fabric版本
+* 开发1.12.2版本
+* 脱离Mod Loader，成为一个特殊的mod
+
 
 ## 如何安装本mod
 
@@ -193,7 +206,7 @@ publishing {
 
 * Linux
 
-首先要确定你安装了GCC并且能使用g++命令
+首先要确定你安装了GCC并且能使用`g++`命令
 
 然后用IDE导入本项目的build.gradle即可
 
@@ -205,7 +218,7 @@ publishing {
 
 然后用IDE导入本项目的build.gradle即可
 
-## 感谢名单(以下排名不分先后)：
+## 感谢名单(以下排名不分先后)
 
 drenal为mod兼容MAC做出的努力
 

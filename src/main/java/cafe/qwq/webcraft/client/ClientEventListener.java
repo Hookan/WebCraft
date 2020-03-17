@@ -140,12 +140,14 @@ public class ClientEventListener
                 label.setFont(new Font("Arial", Font.PLAIN, 16));
                 panel.add(label);
                 JProgressBar bar = new JProgressBar();
+                bar.setMaximum(1000);
                 panel.add(bar);
                 frame.setVisible(true);
 
                 final String finalFileName = fileName;
                 FileUtils.downloadFile(url, outputFile, (size, downloadSize, speed) -> {
                     label.setText(String.format("Downloading %s(%.2fMB/%.2fMB %.2fMB/s)...", finalFileName, downloadSize / 1024f, size / 1024f, speed / 1024f));
+                    bar.setValue((int) (downloadSize * 1000 / size));
                 });
 
                 frame.dispose();
