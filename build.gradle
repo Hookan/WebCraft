@@ -150,6 +150,7 @@ def reobfArtifact = artifacts.add('default', reobfFile) {
 
 task apiJar(type: Jar, dependsOn: 'jar') {
     from "${buildDir}/classes/java/main/"
+    from "${buildDir}/resources/main"
     manifest {
         attributes([
                 "Specification-Title": 'webcraft',
