@@ -17,7 +17,8 @@ version = '0.3.3'
 group = 'cafe.qwq'
 archivesBaseName = 'webcraft'
 
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
