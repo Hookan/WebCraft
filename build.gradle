@@ -149,7 +149,7 @@ def reobfArtifact = artifacts.add('default', reobfFile) {
     classifier 'runtime'
 }
 
-task apiJar(type: Jar, dependsOn: 'jar') {
+task apiJar(type: Jar, dependsOn: 'classes') {
     from "${buildDir}/classes/java/main/"
     from "${buildDir}/resources/main"
     manifest {
