@@ -1,60 +1,55 @@
 # WebCraft
 
-这是一个基于Minecraft Forge的GUI API（本mod还在开发中，目前是MC1.15.2的mod）
+WebCraft is a open-source GUI library based on Minecraft Forge for createing GUIs with HTML, CSS and JavaScript. 
 
-主要功能是可以使用HTML/CSS/JS来进行GUI的编写
+(It is still under development and only supports for Minecraft 1.15.2) 
 
-使用了[Ultralight](https://ultralig.ht)作为Web引擎
+WebCraft accomplishes the GUI-rendering system by [Ultralight](https://ultralig.ht) as Web engine.
 
-如果你需要使用本mod，请不要忘了遵守本mod的开源协议（LGPL）以及Ultralight的协议
+Please obey WebCraft Open-Source License (LGPL) and the licenses of Ultralight.
 
-支持系统：Windows和Linux（仅在Ubuntu/Manjaro/ArchLinux三个发行版上测试过，其它发行版未知，如果你在别的发行版测试通过/不通过可以告诉我）的64位版本
+The operating system we support: Windows & Linux (We only have tested on Ubuntu, Manjaro and ArchLinux so we don't know whether it works on other distros or not. If you test on others, please let us know)
 
-关于MAC的兼容问题：我已经尝试过兼容，无奈没有MAC设备，故放弃，如果你可以兼容MAC，欢迎发PullRequest
+About the support for Mac OS: We have tried our best to, but we don't have any Mac OSX devices, so we gave up. If you can make it support MAC, please send a pull request.
 
-API文档正在编写中
-
+API docs are editing......
 
 ## TODO List
 
-0.4版本：
+0.4 version:
 
-* JavaScript与Java的交互
-* 事件系统
+* Interact between JavaScript and Java.
+* Event system.
 
-正式版本：
+Full version(v1.0)：
 
-* 和背包/格子/TileEntity的配套使用
-* API详细使用文档
+* Use with Inventories/Slots/TileEntities.
+* API doc with details.
 
-未来计划：
+Plans in the future:
 
-* 提供一些和服务器插件交互的API
-* 开发Fabric版本
-* 开发1.12.2版本
-* 脱离Mod Loader，成为一个特殊的mod
+* Provide some APIs for bukkit plugins.
+* Use Fabric instead of Forge
+* Develop a verison in Minecraft 1.12.2.
+* Separate our mod from Mod Loaders and let it be a special mod.
 
+## How to install WebCraft?
 
-## 如何安装本mod
+You can download it from this [link](https://github.com/Hookan/hookan.github.io/tree/master/cafe/qwq/webcraft).
 
-可以到[这里](https://github.com/Hookan/hookan.github.io/tree/master/cafe/qwq/webcraft)下载最新版本（也可以是历史版本）的WebCraft（jar文件名中需要包含`runtime`）
+Then put it into the `mods` folder.(needs to install Forge)
 
-然后放入mods文件夹即可（需要安装Forge）
+And you should install [VC redist](https://aka.ms/vs/16/release/vc_redist.x64.exe) if you are using Windows.
 
-另外，对于Windows用户，还需要安装[VC++运行库](https://aka.ms/vs/16/release/vc_redist.x64.exe)
+When the first time you run this mod, it will download natives jar. It may be VERY slow because we only use one thread to download. So, you can download it by yourself and unzip it in the folder `natives-<webcraft_version>` .
 
-由于本mod在首次运行时会下载natives，又因为本mod采用单线程下载，速度较慢，你可以顺便下载对应版本对应系统的natives（jar文件名中包含了`natives`和`win`或者`linux`），然后再将其解压到`mods/webcraft/natives-<webcraft_verion>`（需要将`<webcraft_version>`替换成你所安装的WebCraft版本（不是MC或者Forge版本））
+## Get Started with WebCraft
 
+Tips: All of the `<webcraft_version>` need to be insteaded of the version of WebCraft you want. (For example, you put the version `0.3.3` into the `webcraft:<webcraft_version>` and the result is `webcraft:0.3.3`)
 
-## 如何构建附属mod的开发环境
+Firstly, download Forge MDK and set `mappings` to `mappings channel: 'snapshot', version: '20200306-1.15.1'` in `build.gradle` (you can skip this step if you still want to apply your appropriate `mappings`)
 
-注：以下全部`<webcraft_version>`需要替换成你想要的WebCraft版本
-
-下载forge mdk后，把mappings修改为`mappings channel: 'snapshot', version: '20200306-1.15.1'`
-
-（如果你想要任意mappings，接下来的`implementation 'cafe.qwq:webcraft:<webcraft_version>:dev'`可以修改为`implementation fg.deobf('cafe.qwq:webcraft:<webcraft_version>:runtime')`）
-
-然后添加以下代码
+Secondly, put these codes in `build.gradle` (NOT IN `buildscript`!!).
 
 ```groovy
 repositories {
@@ -62,9 +57,10 @@ repositories {
 }
 ```
 
-再在`dependencies`添加`implementation 'cafe.qwq:webcraft:<webcraft_version>:dev'`
+Thirdly, add `implementation 'cafe.qwq:webcraft:<webcraft_version>:dev'` or `implementation fg.deobf('cafe.qwq:webcraft:runtime')`(which can help you change mapping freely) to `dependencies`.
 
-完整的build.gradle示范
+This is an example for a completly available`build.gradle`. (Modified by mdk's default build.gradle)
+
 ```groovy
 buildscript {
     repositories {
@@ -88,7 +84,6 @@ archivesBaseName = 'modid'
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    //修改的地方
     mappings channel: 'snapshot', version: '20200306-1.15.1'
     runs {
         client {
@@ -143,17 +138,14 @@ minecraft {
     }
 }
 
-//添加的地方（1）
 repositories {
     maven { url 'https://maven.qwq.cafe' }
 }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.15.2-31.1.0'
-    //添加的地方（2）
     implementation 'cafe.qwq:webcraft:<webcraft_version>:dev'
-    //如果你想要自己定mappings请写下面注释这段
-    //implementation fg.deobf('cafe.qwq:webcraft:<webcraft_version>:runtime')
+    //or implementation fg.deobf('cafe.qwq:webcraft:<webcraft_version>:runtime')
 }
 
 jar {
@@ -190,38 +182,61 @@ publishing {
 
 ```
 
-然后再在`mods.toml`中添加：
+Then add these codes to `mods.toml`:
+
 ```toml
-[[dependencies.modid]] # 请修改成你的modid
+[[dependencies.modid]] # Please change it to your modid.
     modId="webcraft"
     mandatory=true
     versionRange="[<webcraft_version>]"
     ordering="NONE"
-    side="BOTH" # 未来WebCraft会有一些服务端的API
+    side="BOTH" # We will provide some APIs for server in the future.
 ```
 
-## 如何构建本mod的开发环境
+Then you can use WebCraft API in your mod.
+
+```java
+WebScreen screen = new WebScreen();
+Minecraft.getInstance()
+    .displayScreen(screen.addView(new View().loadHTML("<p>Hello,World!</p>")));
+```
+
+## How to build development environment for WebCraft
 
 * Linux
 
-首先要确定你安装了GCC并且能使用`g++`命令
+Firstly, you should install GCC and make sure you can use the command `g++`
 
-然后用IDE导入本项目的build.gradle即可
+For Debian/Ubuntu:
+
+```sh
+sudo apt update
+sudo apt install gcc
+sudo apt install g++
+```
+
+For ArchLinux/Manjaro:
+
+```sh
+sudo pacman -Syy
+sudo pacman -S gcc
+```
+
+For CentOS/Fedora:
+
+```sh
+sudo dnf update
+sudo dnf install gcc
+sudo dnf install gcc-c++
+```
+
+Then import this project into your IDE.
 
 * Windows
 
-首先安装VisualStudio的BuildTool（只用安装VC++）
+Install the BuildTool of VisualStudio at first.(Only need to install VC++)
 
-其次你需要找到你安装的路径并配置环境变量，如果配置成功，你应该可以在命令行中使用`cl`命令
+Then you need to find the path you install in and configure the environment variables. If you configure it successfully, you should  able to use the command `cl` in the command line.
 
-然后用IDE导入本项目的build.gradle即可
+At last you should import this project into your IDE.
 
-## 感谢名单(以下排名不分先后)
-
-drenal为mod兼容MAC做出的努力
-
-协助测试人员：
-
-* Bogos外群群员（南小笙 dragon_龙鑫 等）
-* 蓝鲸
-* woshiluo
