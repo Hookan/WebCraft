@@ -34,7 +34,7 @@ public class ClientEventListener
     static
     {
         if(WebCraft.RUNTIME_OS== WebCraft.OS.WINDOWS)
-            MAVEN_URL = "https://ci.qwq.cafe/maven";
+            MAVEN_URL = "https://ci.qwq.cafe/maven/";
 
         if (!WebCraft.VERSION.equals("NONE") && !WebCraft.VERSION.equals("NULL"))
         {
