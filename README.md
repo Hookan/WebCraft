@@ -8,7 +8,7 @@ WebCraft accomplishes the GUI-rendering system by [Ultralight](https://ultralig.
 
 Please obey WebCraft Open-Source License (LGPL) and the licenses of Ultralight.
 
-The operating system we support: Windows & Linux (We only have tested on Ubuntu, Manjaro and ArchLinux so we don't know whether it works on other distros or not. If you test on others, please let us know)
+The operating system we support: Windows & Linux (We only have tested on Ubuntu, Manjaro and ArchLinux so we don't know whether it can work on other distros or not. If you test on others, please let us know)
 
 About the support for Mac OS: We have tried our best to, but we don't have any Mac OSX devices, so we gave up. If you can make it support MAC, please send a pull request.
 
@@ -53,7 +53,7 @@ Secondly, put these codes in `build.gradle` (NOT IN `buildscript`!!).
 
 ```groovy
 repositories {
-    maven { url 'https://maven.qwq.cafe' }
+    maven { url 'https://maven.qwq.cafe' } // or https://ci.qwq.cafe/maven
 }
 ```
 
