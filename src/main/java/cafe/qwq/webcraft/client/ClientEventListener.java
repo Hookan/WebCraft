@@ -28,12 +28,14 @@ import java.util.zip.ZipFile;
 public class ClientEventListener
 {
     private static Consumer<TickEvent.RenderTickEvent> consumer;
-    private static final String MAVEN_URL = "https://maven.qwq.cafe/";
-    //private static final String MAVEN_URL = "file:///E:/mod/hookan.github.io/";
+    private static String MAVEN_URL = "https://maven.qwq.cafe/";
     private static String libPath;
 
     static
     {
+        if(WebCraft.RUNTIME_OS== WebCraft.OS.WINDOWS)
+            MAVEN_URL = "https://ci.qwq.cafe/maven";
+
         if (!WebCraft.VERSION.equals("NONE") && !WebCraft.VERSION.equals("NULL"))
         {
             libPath = "mods/webcraft/natives-" + WebCraft.VERSION + "/";
