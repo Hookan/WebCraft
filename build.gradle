@@ -13,7 +13,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'cpp'
 
-version = '0.3.4'
+version = '0.3.5'
 group = 'cafe.qwq'
 archivesBaseName = 'webcraft'
 
@@ -30,6 +30,7 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
+            property 'cafe.qwq.webcraft.nativesPath', "${buildDir}/libs/webcraft_core/shared/"
             mods {
                 webcraft {
                     source sourceSets.main
@@ -236,9 +237,5 @@ compileJava << {
             from "${project.projectDir}/cpplibs/mac"
         }
         into "${buildDir}/libs/webcraft_core/shared"
-    }
-    copy {
-        from "${buildDir}/libs/webcraft_core/shared"
-        into "${project.projectDir}/run/mods/webcraft/natives"
     }
 }

@@ -1,0 +1,19 @@
+@font-face {
+    font-family: 'mc';
+    src: url('file:///mods/webcraft/assets/webcraft/web/minecraft.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'fzxs12';
+    src: url('file:///mods/webcraft/assets/webcraft/web/fzxs12.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body,button {
+    font-family: 'mc','fzxs12';
+    color:#fff;
+    font-size:18px;
+}

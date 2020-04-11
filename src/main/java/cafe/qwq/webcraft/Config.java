@@ -1,6 +1,7 @@
 package cafe.qwq.webcraft;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import net.minecraftforge.api.distmarker.Dist;
@@ -60,7 +61,7 @@ public class Config
         {
             try (JsonReader reader = new JsonReader(new FileReader(f)))
             {
-                Gson gson = new Gson();
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();;
                 instance = gson.fromJson(reader, Config.class);
             }
             catch (IOException e)
@@ -77,7 +78,7 @@ public class Config
                 f.createNewFile();
                 try (JsonWriter writer = new JsonWriter(new FileWriter(f, false)))
                 {
-                    Gson gson = new Gson();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();;
                     gson.toJson(instance, Config.class, writer);
                 }
             }

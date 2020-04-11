@@ -3,6 +3,7 @@ package cafe.qwq.webcraft.demo;
 import cafe.qwq.webcraft.api.View;
 import cafe.qwq.webcraft.api.WebScreen;
 import cafe.qwq.webcraft.api.math.Vec4i;
+import com.google.gson.JsonParser;
 import net.minecraft.client.gui.screen.WorldSelectionScreen;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
@@ -19,7 +20,7 @@ public class Demo
     {
         MinecraftForge.EVENT_BUS.addListener(Demo::onGUiOpen);
     }
-
+    
     public static void onGUiOpen(final GuiOpenEvent event)
     {
         if (event.getGui() instanceof WorldSelectionScreen)
@@ -31,6 +32,9 @@ public class Demo
             try
             {
                 view.loadHTML(new ResourceLocation("demo:test.html"));
+                view.addJSFuncWithCallback("qwqwq", obj -> {
+                    return new JsonParser().parse("{\"qwq\": \"老子宇宙第一可爱\"}").getAsJsonObject();
+                });
             }
             catch (IOException e)
             {

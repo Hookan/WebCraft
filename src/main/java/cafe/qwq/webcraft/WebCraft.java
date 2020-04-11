@@ -1,10 +1,14 @@
 package cafe.qwq.webcraft;
 
+import cafe.qwq.webcraft.util.FileUtils;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.MavenVersionStringHelper;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
 
 @Mod(WebCraft.MODID)
 public class WebCraft
@@ -16,6 +20,17 @@ public class WebCraft
 
     public WebCraft()
     {
+        try
+        {
+            FileUtils.upzipIfNeeded(new ResourceLocation(MODID, "minecraft.ttf"));
+            FileUtils.upzipIfNeeded(new ResourceLocation(MODID,"fzxs12.ttf"));
+            FileUtils.upzipIfNeeded(new ResourceLocation(MODID,"minecraft.css"));
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
         String osName = System.getProperty("os.name").toLowerCase();
         if (osName.contains("win"))
             RUNTIME_OS = OS.WINDOWS;

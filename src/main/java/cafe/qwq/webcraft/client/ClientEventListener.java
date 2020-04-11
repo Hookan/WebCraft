@@ -41,7 +41,7 @@ public class ClientEventListener
             libPath = "mods/webcraft/natives-" + WebCraft.VERSION + "/";
             if (!checkNatives()) downloadNatives();
         }
-        else libPath = "mods/webcraft/natives/";
+        else libPath = System.getProperty("cafe.qwq.webcraft.nativesPath");
 
         if (WebCraft.RUNTIME_OS == WebCraft.OS.WINDOWS)
         {

@@ -16,7 +16,6 @@ public class WebScreen extends Screen
     private boolean shouldCloseOnEsc;
     private List<IRenderer> rendererList1;
     private List<IRenderer> rendererList2;
-
     public WebScreen(ITextComponent component)
     {
         super(component);

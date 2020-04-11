@@ -2,8 +2,156 @@
 #include <Ultralight/Ultralight.h>
 #include "gl/GPUDriverGL.h"
 #include <iostream>
+#include <string>
+#include <map>
 
 using namespace ultralight;
+
+JNIEnv* env;
+
+std::map<View*,jobject> view_map;
+std::map<JSObjectRef,View*> func_view_map;
+std::map<JSObjectRef,jstring> name_map;
+
+JSValueRef JSFuncCallback(JSContextRef ctx, JSObjectRef func,
+               JSObjectRef thisObject, size_t count, const JSValueRef args[], JSValueRef* exception)
+{
+    //std::cout<<"JS Function Callback pid="<<((int)syscall(SYS_gettid))<<std::endl;
+    View* view = func_view_map[func];
+    jobject jview = view_map[view];
+    jclass clazz = env->GetObjectClass(jview);
+    jstring result = 0;
+    if(!count)
+    {
+        jmethodID mid = env->GetMethodID(clazz, "jsFuncCallback", "(Ljava/lang/String;)Ljava/lang/String;");
+        result = (jstring)(env->CallObjectMethod(jview, mid, name_map[func]));
+    }
+    else
+    {
+        JSStringRef jsStr = JSValueCreateJSONString(ctx, args[0], 0, NULL);
+        size_t siz = JSStringGetMaximumUTF8CStringSize(jsStr);
+        char* cstr = (char*)malloc(siz);
+        JSStringGetUTF8CString(jsStr, cstr, siz);
+        jstring jstr = env->NewStringUTF(cstr);
+        free(cstr);
+        JSStringRelease(jsStr);
+        jmethodID mid = env->GetMethodID(clazz, "jsFuncCallback", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
+        result = (jstring)(env->CallObjectMethod(jview, mid, name_map[func], jstr));
+    }
+    if(result)
+    {
+        const char* cstr = env->GetStringUTFChars(result, 0);
+        //std::cout<<"CSTR="<<cstr<<std::endl;
+        JSStringRef jsStr = JSStringCreateWithUTF8CString(cstr);
+        JSValueRef value = JSValueMakeFromJSONString(ctx,jsStr);
+        JSStringRelease(jsStr);
+        return value;
+    }
+    return JSValueMakeNull(ctx);
+}
+
+class WCCLoadListener:public LoadListener
+{
+public:
+    virtual void OnDOMReady(View* view) override
+    {
+        jobject jview = view_map[view];
+        jclass clazz = env->GetObjectClass(jview);
+        jmethodID mid = env->GetMethodID(clazz, "onDOMReady", "()V");
+        env->CallVoidMethod(jview, mid);
+    }
+};
+
+inline std::string ToUTF8(const String& str)
+{
+    String8 utf8 = str.utf8();
+    return std::string(utf8.data(), utf8.length());
+}
+
+inline const char* Stringify(MessageSource source) {
+    switch(source)
+    {
+        case kMessageSource_XML: return "XML";
+        case kMessageSource_JS: return "JS";
+        case kMessageSource_Network: return "Network";
+        case kMessageSource_ConsoleAPI: return "ConsoleAPI";
+        case kMessageSource_Storage: return "Storage";
+        case kMessageSource_AppCache: return "AppCache";
+        case kMessageSource_Rendering: return "Rendering";
+        case kMessageSource_CSS: return "CSS";
+        case kMessageSource_Security: return "Security";
+        case kMessageSource_ContentBlocker: return "ContentBlocker";
+        case kMessageSource_Other: return "Other";
+        default: return "";
+    }
+}
+
+inline const char* Stringify(MessageLevel level)
+{
+    switch(level)
+    {
+        case kMessageLevel_Log: return "Log";
+        case kMessageLevel_Warning: return "Warning";
+        case kMessageLevel_Error: return "Error";
+        case kMessageLevel_Debug: return "Debug";
+        case kMessageLevel_Info: return "Info";
+        default: return "";
+    }
+}
+
+class WCCViewListener:public ViewListener
+{
+public:
+    virtual void OnAddConsoleMessage(View* caller, MessageSource source, MessageLevel level,
+                   const String& message, uint32_t line_number, uint32_t column_number, const String& source_id)
+    {
+        std::cout << "[WebCraft-Console]: [" << Stringify(source) << "] [" << Stringify(level) << "] " << ToUTF8(message);
+
+        if (source == kMessageSource_JS)
+        {
+            std::cout << " (" << ToUTF8(source_id) << " @ line " << line_number << ", col " << column_number << ")";
+        }
+
+        std::cout << std::endl;
+    }
+};
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_cafe_qwq_webcraft_api_View_addJSFuncWithCallback(JNIEnv* env_, jobject obj, jlong pointer, jstring jname)
+{
+    RefPtr<View> &view = *((RefPtr<View>*)pointer);
+    JSContextRef ctx = view->js_context();
+    const char* cname = env_->GetStringUTFChars(jname, 0);
+    JSStringRef name = JSStringCreateWithUTF8CString(cname);
+    JSObjectRef func = JSObjectMakeFunctionWithCallback(ctx, name, JSFuncCallback);
+    func_view_map[func] = view.get();
+    name_map[func] = (jstring)(env->NewGlobalRef(jname));
+    JSObjectRef globalObj = JSContextGetGlobalObject(ctx);
+    JSObjectSetProperty(ctx, globalObj, name, func, 0, 0);
+    JSStringRelease(name);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_cafe_qwq_webcraft_api_WebRenderer_ncreateView(JNIEnv* env_, jobject obj, jlong pointer, jint width, jint height, jboolean transparent,jobject jview)
+{
+    env = env_;
+    RefPtr<View> view = ((RefPtr<Renderer>*)pointer)->get()->CreateView((uint32_t)width, (uint32_t)height, (unsigned char)transparent);
+    view->set_load_listener(new WCCLoadListener());
+    view->set_view_listener(new WCCViewListener());
+    view_map[view.get()] = env->NewGlobalRef(jview);
+    return (jlong)(new RefPtr<View>(view));
+}
+
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_cafe_qwq_webcraft_api_WebRenderer_update(JNIEnv* env_, jobject obj, jlong pointer)
+{
+    env = env_;
+    ((RefPtr<Renderer>*)pointer)->get()->Update();
+}
 
 //debug code
 /*void printInt(JNIEnv* env_, jobject obj, int x)
@@ -17,6 +165,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_cafe_qwq_webcraft_api_View_nloadURL(JNIEnv* env_, jobject obj, jlong pointer, jstring str)
 {
+    env = env_;
     const char* url = env_->GetStringUTFChars(str, 0);
     const int length = env_->GetStringUTFLength(str);
     ((RefPtr<View>*)pointer)->get()->LoadURL(String(url,length));
@@ -26,6 +175,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_cafe_qwq_webcraft_api_View_nloadHTML(JNIEnv* env_, jobject obj, jlong pointer, jstring str)
 {
+    env = env_;
     const char* html = env_->GetStringUTFChars(str, 0);
     const int length = env_->GetStringUTFLength(str);
     ((RefPtr<View>*)pointer)->get()->LoadHTML(String(html,length));
@@ -35,6 +185,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_cafe_qwq_webcraft_api_View_resize(JNIEnv* env_, jobject obj, jlong pointer, jint width, jint height)
 {
+    env = env_;
     ((RefPtr<View>*)pointer)->get()->Resize((uint32_t)width, (uint32_t)height);
 }
 
@@ -42,6 +193,7 @@ extern "C"
 JNIEXPORT jlong JNICALL
 Java_cafe_qwq_webcraft_api_View_getRTT(JNIEnv* env_, jobject obj, jlong pointer)
 {
+    env = env_;
     RenderTarget* rttn = new RenderTarget();
     *rttn = (((RefPtr<View>*)pointer)->get()->render_target());
     return (jlong)rttn;
@@ -51,6 +203,7 @@ extern "C"
 JNIEXPORT jint JNICALL
 Java_cafe_qwq_webcraft_api_View_getRTTTextureID(JNIEnv* env_, jobject obj, jlong pointer)
 {
+    env = env_;
     RenderTarget* rttn = (RenderTarget*)pointer;
     GPUDriverGL* gpu_driver=(GPUDriverGL*)(Platform::instance().gpu_driver());
     return (jint)(gpu_driver->GetOpenGLTextureByUT(rttn->texture_id));
@@ -97,13 +250,15 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_cafe_qwq_webcraft_api_View_destroyView(JNIEnv* env_, jobject obj, jlong pointer)
 {
-    delete ((RefPtr<View>*)pointer);
+    RefPtr<View>* view = ((RefPtr<View>*)pointer);
+    delete view;
 }
 
 extern "C"
 JNIEXPORT void JNICALL
 Java_cafe_qwq_webcraft_api_View_nfireScrollEvent(JNIEnv* env_, jobject obj, jlong pointer,jint amount)
 {
+    env = env_;
     ScrollEvent event;
     event.type = ScrollEvent::kType_ScrollByPixel;
     event.delta_y = (int)amount;
@@ -115,6 +270,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_cafe_qwq_webcraft_api_View_nfireMouseEvent(JNIEnv* env_, jobject obj, jlong pointer, jint type, jint button, jint x, jint y)
 {
+    env = env_;
     MouseEvent event;
     event.type = (MouseEvent::Type)type;
     event.button = (MouseEvent::Button)button;
@@ -127,6 +283,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_cafe_qwq_webcraft_api_View_nfireKeyEvent(JNIEnv* env_, jobject obj, jlong pointer, jint type, jint modifiers, jstring str, jint native_code, jint virtual_code)
 {
+    env = env_;
     KeyEvent event;
     event.type = (KeyEvent::Type)type;
     if(type==KeyEvent::kType_Char)
@@ -147,4 +304,13 @@ Java_cafe_qwq_webcraft_api_View_nfireKeyEvent(JNIEnv* env_, jobject obj, jlong p
         GetKeyIdentifierFromVirtualKeyCode(event.virtual_key_code, event.key_identifier);
     }
     ((RefPtr<View>*)pointer)->get()->FireKeyEvent(event);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_cafe_qwq_webcraft_api_View_nmakeUnuse(JNIEnv* env, jobject jview, jlong pointer)
+{
+    RefPtr<View>* view = ((RefPtr<View>*)pointer);
+    view_map.erase(view->get());
+    env->DeleteGlobalRef(jview);
 }

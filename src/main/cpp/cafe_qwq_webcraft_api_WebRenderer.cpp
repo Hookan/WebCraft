@@ -12,25 +12,10 @@ Java_cafe_qwq_webcraft_api_WebRenderer_createRenderer(JNIEnv* env_, jclass clazz
 }
 
 extern "C"
-JNIEXPORT jlong JNICALL
-Java_cafe_qwq_webcraft_api_WebRenderer_ncreateView(JNIEnv* env_, jobject obj, jlong pointer, jint width, jint height, jboolean transparent)
-{
-    return (jlong)(new RefPtr<View>(((RefPtr<Renderer>*)pointer)->
-                        get()->CreateView((uint32_t)width, (uint32_t)height, (unsigned char)transparent)));
-}
-
-extern "C"
 JNIEXPORT void JNICALL
 Java_cafe_qwq_webcraft_api_WebRenderer_npurgeMemory(JNIEnv* env_, jobject obj, jlong pointer)
 {
     ((RefPtr<Renderer>*)pointer)->get()->PurgeMemory();
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_cafe_qwq_webcraft_api_WebRenderer_update(JNIEnv* env_, jobject obj, jlong pointer)
-{
-    ((RefPtr<Renderer>*)pointer)->get()->Update();
 }
 
 extern "C"
@@ -43,5 +28,5 @@ Java_cafe_qwq_webcraft_api_WebRenderer_render(JNIEnv* env_, jobject obj, jlong p
     {
         gpu_driver->DrawCommandList();
     }
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
