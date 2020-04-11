@@ -1,5 +1,7 @@
 # WebCraft
 
+![](https://i.loli.net/2020/04/11/j5YimS2nNXUbQpJ.png)
+
 WebCraft is a open-source GUI library based on Minecraft Forge for createing GUIs with HTML, CSS and JavaScript. 
 
 (It is still under development and only supports for Minecraft 1.15.2) 
