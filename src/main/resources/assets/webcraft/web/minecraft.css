@@ -12,8 +12,39 @@
     font-style: normal;
 }
 
-body,button {
+body {
     font-family: 'mc','fzxs12';
-    color:#fff;
-    font-size:18px;
+    color: #fff;
+    font-size: 18px;
+}
+
+button {
+    font-family: 'mc','fzxs12';
+    color: #fff;
+    font-size: 18px;
+    background: url('file:///mods/webcraft/assets/webcraft/web/button/button.png');
+    background-size: 100% 100%;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    float: left;
+    border-radius: 0px;
+    padding-top: 2px;
+    padding-bottom: 33px;
+}
+
+button:hover {
+    background: url('file:///mods/webcraft/assets/webcraft/web/button/button_hover.png');
+    background-size: 100% 100%;
+}
+
+button:disabled {
+    background: url('file:///mods/webcraft/assets/webcraft/web/button/button_disabled.png');
+    background-size: 100% 100%;
+    color: #aaa;
+}
+
+button:active {
+    background: url('file:///mods/webcraft/assets/webcraft/web/button/button_disabled.png');
+    background-size: 100% 100%;
 }

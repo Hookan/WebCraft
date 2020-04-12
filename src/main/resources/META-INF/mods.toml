@@ -6,6 +6,7 @@ version="${file.jarVersion}"
 displayName="WebCraft"
 credits="Bogos"
 authors="hookan"
+logoFile="webcraft_logo.png"
 description='''
 A GUI API for modders to use HTML/JS/CSS to write GUIs.
 '''

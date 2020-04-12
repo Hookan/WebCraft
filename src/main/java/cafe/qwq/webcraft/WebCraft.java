@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Mod(WebCraft.MODID)
 public class WebCraft
@@ -17,19 +18,22 @@ public class WebCraft
     public static String VERSION = "NULL";
     public static final Logger LOGGER = LogManager.getLogger();
     public static OS RUNTIME_OS;
+    private static final String[] resourceArray = {"minecraft.ttf",
+            "fzxs12.ttf", "minecraft.css", "button/button.png", "button/button_disabled.png",
+            "button/button_hover.png"};
 
     public WebCraft()
     {
-        try
-        {
-            FileUtils.upzipIfNeeded(new ResourceLocation(MODID, "minecraft.ttf"));
-            FileUtils.upzipIfNeeded(new ResourceLocation(MODID,"fzxs12.ttf"));
-            FileUtils.upzipIfNeeded(new ResourceLocation(MODID,"minecraft.css"));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        Arrays.stream(resourceArray).forEach(resource -> {
+            try
+            {
+                FileUtils.upzipIfNeeded(new ResourceLocation(MODID, resource));
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        });
 
         String osName = System.getProperty("os.name").toLowerCase();
         if (osName.contains("win"))

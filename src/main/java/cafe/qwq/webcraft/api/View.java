@@ -36,7 +36,7 @@ public class View
     
     public View(int x, int y, int width, int height)
     {
-        this(new Vec4i(x, y, width, height), true, 2.0f);
+        this(new Vec4i(x, y, width, height), true, 1.5f);
     }
     
     public void finalize() throws Throwable
