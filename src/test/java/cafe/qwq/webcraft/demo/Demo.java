@@ -40,7 +40,7 @@ public class Demo
             {
                 e.printStackTrace();
             }
-            //view.loadURL("https://www.mcbbs.net");
+            //view.loadURL("https://qwq.cafe");
             //view.loadHTML("<p>我好可爱啊喵</p>");
             //view.loadHTML("<p style=\"font-family: 微软雅黑;color:#aaa;\">■■■</p>" +
             //        "<p style=\"font-family: 微软雅黑;color:#555;\">草草草</p>" +

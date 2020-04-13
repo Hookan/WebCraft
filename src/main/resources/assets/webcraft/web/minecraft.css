@@ -36,6 +36,9 @@ button {
 button:hover {
     background: url('file:///mods/webcraft/assets/webcraft/web/button/button_hover.png');
     background-size: 100% 100%;
+    background-blend-mode: color;
+    border: none;
+    color: #fff;
 }
 
 button:disabled {
@@ -47,4 +50,6 @@ button:disabled {
 button:active {
     background: url('file:///mods/webcraft/assets/webcraft/web/button/button_disabled.png');
     background-size: 100% 100%;
+    border: none;
+    color: #aaa;
 }

@@ -185,8 +185,10 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_cafe_qwq_webcraft_api_View_resize(JNIEnv* env_, jobject obj, jlong pointer, jint width, jint height)
 {
+    std::cout<<(int)width<<" "<<(int)height<<std::endl;
     env = env_;
     ((RefPtr<View>*)pointer)->get()->Resize((uint32_t)width, (uint32_t)height);
+    //((RefPtr<View>*)pointer)->get()->set_needs_paint(true);
 }
 
 extern "C"

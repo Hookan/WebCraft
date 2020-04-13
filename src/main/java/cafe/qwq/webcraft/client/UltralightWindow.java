@@ -1,7 +1,6 @@
 package cafe.qwq.webcraft.client;
 
 import net.minecraft.client.Minecraft;
-import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.glfw.GLFW.*;
 
