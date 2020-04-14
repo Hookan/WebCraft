@@ -20,7 +20,7 @@ public class Demo
     {
         MinecraftForge.EVENT_BUS.addListener(Demo::onGUiOpen);
     }
-    
+
     public static void onGUiOpen(final GuiOpenEvent event)
     {
         if (event.getGui() instanceof WorldSelectionScreen)
@@ -33,7 +33,10 @@ public class Demo
             {
                 view.loadHTML(new ResourceLocation("demo:test.html"));
                 view.addJSFuncWithCallback("qwqwq", obj -> {
-                    return new JsonParser().parse("{\"qwq\": \"老子宇宙第一可爱\"}").getAsJsonObject();
+                    return new JsonParser().parse("{\"qwq\": \"老子宇宙第一可爱\"}");
+                });
+                view.addDOMReadyListener(() -> {
+                    System.out.println(view.evaluteJS("qwq()").toString());
                 });
             }
             catch (IOException e)

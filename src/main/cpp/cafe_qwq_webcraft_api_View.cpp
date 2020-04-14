@@ -13,6 +13,28 @@ std::map<View*,jobject> view_map;
 std::map<JSObjectRef,View*> func_view_map;
 std::map<JSObjectRef,jstring> name_map;
 
+inline JSValueRef jstringToJSONValue(JNIEnv* env_, JSContextRef ctx, jstring jstr)
+{
+    const char* cstr = env_->GetStringUTFChars(jstr, 0);
+    //std::cout<<"CSTR="<<cstr<<std::endl;
+    JSStringRef jsStr = JSStringCreateWithUTF8CString(cstr);
+    JSValueRef value = JSValueMakeFromJSONString(ctx,jsStr);
+    JSStringRelease(jsStr);
+    return value;
+}
+
+inline jstring jsonValueToJstring(JNIEnv* env_, JSContextRef ctx, JSValueRef value)
+{
+    JSStringRef jsStr = JSValueCreateJSONString(ctx, value, 0, NULL);
+    size_t siz = JSStringGetMaximumUTF8CStringSize(jsStr);
+    char* cstr = (char*)malloc(siz);
+    JSStringGetUTF8CString(jsStr, cstr, siz);
+    jstring jstr = env_->NewStringUTF(cstr);
+    free(cstr);
+    JSStringRelease(jsStr);
+    return jstr;
+}
+
 JSValueRef JSFuncCallback(JSContextRef ctx, JSObjectRef func,
                JSObjectRef thisObject, size_t count, const JSValueRef args[], JSValueRef* exception)
 {
@@ -28,24 +50,13 @@ JSValueRef JSFuncCallback(JSContextRef ctx, JSObjectRef func,
     }
     else
     {
-        JSStringRef jsStr = JSValueCreateJSONString(ctx, args[0], 0, NULL);
-        size_t siz = JSStringGetMaximumUTF8CStringSize(jsStr);
-        char* cstr = (char*)malloc(siz);
-        JSStringGetUTF8CString(jsStr, cstr, siz);
-        jstring jstr = env->NewStringUTF(cstr);
-        free(cstr);
-        JSStringRelease(jsStr);
+        jstring jstr = jsonValueToJstring(env, ctx, args[0]);
         jmethodID mid = env->GetMethodID(clazz, "jsFuncCallback", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
         result = (jstring)(env->CallObjectMethod(jview, mid, name_map[func], jstr));
     }
     if(result)
     {
-        const char* cstr = env->GetStringUTFChars(result, 0);
-        //std::cout<<"CSTR="<<cstr<<std::endl;
-        JSStringRef jsStr = JSStringCreateWithUTF8CString(cstr);
-        JSValueRef value = JSValueMakeFromJSONString(ctx,jsStr);
-        JSStringRelease(jsStr);
-        return value;
+         return jstringToJSONValue(env, ctx, result);
     }
     return JSValueMakeNull(ctx);
 }
@@ -140,7 +151,7 @@ Java_cafe_qwq_webcraft_api_WebRenderer_ncreateView(JNIEnv* env_, jobject obj, jl
     RefPtr<View> view = ((RefPtr<Renderer>*)pointer)->get()->CreateView((uint32_t)width, (uint32_t)height, (unsigned char)transparent);
     view->set_load_listener(new WCCLoadListener());
     view->set_view_listener(new WCCViewListener());
-    view_map[view.get()] = env->NewGlobalRef(jview);
+    //view_map[view.get()] = env->NewGlobalRef(jview);
     return (jlong)(new RefPtr<View>(view));
 }
 
@@ -185,7 +196,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_cafe_qwq_webcraft_api_View_resize(JNIEnv* env_, jobject obj, jlong pointer, jint width, jint height)
 {
-    std::cout<<(int)width<<" "<<(int)height<<std::endl;
+    //std::cout<<(int)width<<" "<<(int)height<<std::endl;
     env = env_;
     ((RefPtr<View>*)pointer)->get()->Resize((uint32_t)width, (uint32_t)height);
     //((RefPtr<View>*)pointer)->get()->set_needs_paint(true);
@@ -253,6 +264,17 @@ JNIEXPORT void JNICALL
 Java_cafe_qwq_webcraft_api_View_destroyView(JNIEnv* env_, jobject obj, jlong pointer)
 {
     RefPtr<View>* view = ((RefPtr<View>*)pointer);
+    auto it = func_view_map.begin();
+    while(it != func_view_map.end())
+    {
+        if(it->second == view->get())
+        {
+            name_map.erase(it->first);
+            func_view_map.erase(it++);
+        }
+        else
+            it++;
+    }
     delete view;
 }
 
@@ -310,9 +332,32 @@ Java_cafe_qwq_webcraft_api_View_nfireKeyEvent(JNIEnv* env_, jobject obj, jlong p
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_cafe_qwq_webcraft_api_View_nmakeUnuse(JNIEnv* env, jobject jview, jlong pointer)
+Java_cafe_qwq_webcraft_api_View_disable(JNIEnv* env, jobject jview, jlong pointer)
 {
     RefPtr<View>* view = ((RefPtr<View>*)pointer);
+    jobject jview2 = view_map[view->get()];
     view_map.erase(view->get());
-    env->DeleteGlobalRef(jview);
+    env->DeleteGlobalRef(jview2);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_cafe_qwq_webcraft_api_View_enable(JNIEnv* env, jobject jview, jlong pointer)
+{
+    RefPtr<View>* view = ((RefPtr<View>*)pointer);
+    if(view_map.find(view->get()) != view_map.end()) return;
+    view_map[view->get()] = env->NewGlobalRef(jview);
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_cafe_qwq_webcraft_api_View_evaluateScript(JNIEnv* env_, jobject jview, jlong pointer, jstring jstr)
+{
+    env = env_;
+    RefPtr<View>* view = ((RefPtr<View>*)pointer);
+    const char* script = env_->GetStringUTFChars(jstr, 0);
+    const int length = env_->GetStringUTFLength(jstr);
+    JSValueRef result = view->get()->EvaluateScript(String(script,length));
+    if(JSValueIsNull(view->get()->js_context(), result)) return 0;
+    return jsonValueToJstring(env_, view->get()->js_context(), result);
 }

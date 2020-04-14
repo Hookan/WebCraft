@@ -69,12 +69,16 @@ public class WebScreen extends Screen
     protected void init()
     {
         scale = minecraft.getMainWindow().getGuiScaleFactor();
-        viewList.forEach(view -> view.onResize(new Vec2i((int) (width * scale), (int) (height * scale))));
+        viewList.forEach(view -> {
+            view.enable();
+            view.onResize(new Vec2i((int) (width * scale), (int) (height * scale)));
+        });
     }
 
     public void onClose()
     {
         super.onClose();
+        viewList.forEach(view -> view.disable());
         WebRenderer.INSTANCE.purgeMemory();
     }
 

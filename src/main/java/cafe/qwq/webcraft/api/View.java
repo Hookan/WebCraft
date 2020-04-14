@@ -3,6 +3,7 @@ package cafe.qwq.webcraft.api;
 import cafe.qwq.webcraft.api.math.Vec2i;
 import cafe.qwq.webcraft.api.math.Vec4i;
 import cafe.qwq.webcraft.util.FileUtils;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -124,7 +125,7 @@ public class View
 
     public View loadURL(String url)
     {
-        System.out.println(url);
+        //System.out.println(url);
         nloadURL(viewPointer, url);
         return this;
     }
@@ -179,30 +180,56 @@ public class View
         return this;
     }
 
+    public void addDOMReadyListener(Runnable runnable)
+    {
+        domReadyCallbakList.add(runnable);
+    }
+
     public void onDOMReady()
     {
         jsCallbackMap.keySet().forEach(name -> addJSFuncWithCallback(viewPointer, name));
+        domReadyCallbakList.forEach(Runnable::run);
     }
 
-    public void makeUnuse()
+    public void enable()
     {
-        nmakeUnuse(this.viewPointer);
+        enable(viewPointer);
+    }
+
+    public void disable()
+    {
+        disable(viewPointer);
     }
 
     public String jsFuncCallback(String funcName)
     {
         IJSFuncCallback callback = jsCallbackMap.get(funcName);
-        JsonObject obj = callback.callback(null);
+        JsonElement obj = callback.callback(null);
         return obj == null ? null : obj.toString();
     }
 
     public String jsFuncCallback(String funcName, String jsonStr)
     {
         IJSFuncCallback callback = jsCallbackMap.get(funcName);
-        JsonObject obj = callback.callback(jsonParser.parse(jsonStr).getAsJsonObject());
+        JsonElement obj = callback.callback(jsonParser.parse(jsonStr));
         return obj == null ? null : obj.toString();
     }
-    
+
+    public JsonElement evaluteJS(String js)
+    {
+        String result = evaluateScript(viewPointer, js);
+        if (result == null) return null;
+        return jsonParser.parse(result);
+    }
+
+    public JsonElement evaluteJSFunc(String jsFuncName, JsonObject arg)
+    {
+        String js = jsFuncName + "(" + arg.toString() + ")";
+        String result = evaluateScript(viewPointer, js);
+        if (result == null) return null;
+        return jsonParser.parse(result);
+    }
+
     /*public static void test(int x)
     {
         WebCraft.LOGGER.info(x);
@@ -222,7 +249,7 @@ public class View
 
     public interface IJSFuncCallback
     {
-        JsonObject callback(JsonObject obj);
+        JsonElement callback(JsonElement obj);
     }
 
     private native void nloadURL(long pointer, String url);
@@ -255,5 +282,9 @@ public class View
 
     private native void addJSFuncWithCallback(long pointer, String funcName);
 
-    private native void nmakeUnuse(long pointer);
+    private native void enable(long pointer);
+
+    private native void disable(long pointer);
+
+    private native String evaluateScript(long pointer, String script);
 }

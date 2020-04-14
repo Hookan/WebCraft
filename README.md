@@ -18,12 +18,7 @@ API docs are editing......
 
 ## TODO List
 
-0.4 version:
-
-* Interact between JavaScript and Java.
-* Event system.
-
-Full version(v1.0)：
+Full version(v1.0):
 
 * Use with Inventories/Slots/TileEntities.
 * API doc with details.
@@ -198,7 +193,7 @@ Then add these codes to `mods.toml`:
 Then you can use WebCraft API in your mod.
 
 ```java
-WebScreen screen = new WebScreen();
+WebScreen screen = new WebScreen(new StringTextComponent("MyGui"));
 Minecraft.getInstance()
     .displayScreen(screen.addView(new View().loadHTML("<p>Hello,World!</p>")));
 ```
@@ -241,4 +236,3 @@ Install the BuildTool of VisualStudio at first.(Only need to install VC++)
 Then you need to find the path you install in and configure the environment variables. If you configure it successfully, you should  able to use the command `cl` in the command line.
 
 At last you should import this project into your IDE.
-
