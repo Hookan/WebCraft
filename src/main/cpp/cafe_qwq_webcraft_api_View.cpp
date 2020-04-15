@@ -358,6 +358,7 @@ Java_cafe_qwq_webcraft_api_View_evaluateScript(JNIEnv* env_, jobject jview, jlon
     const char* script = env_->GetStringUTFChars(jstr, 0);
     const int length = env_->GetStringUTFLength(jstr);
     JSValueRef result = view->get()->EvaluateScript(String(script,length));
+    if(JSValueIsUndefined(view->get()->js_context(), result)) return 0;
     if(JSValueIsNull(view->get()->js_context(), result)) return 0;
     return jsonValueToJstring(env_, view->get()->js_context(), result);
 }

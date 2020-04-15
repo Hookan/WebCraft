@@ -36,7 +36,7 @@ public class Demo
                     return new JsonParser().parse("{\"qwq\": \"老子宇宙第一可爱\"}");
                 });
                 view.addDOMReadyListener(() -> {
-                    System.out.println(view.evaluteJS("qwq()").toString());
+                    /*System.out.println(*/view.evaluteJS("qwq()");//.toString());
                 });
             }
             catch (IOException e)
