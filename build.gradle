@@ -13,7 +13,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'cpp'
 
-version = '0.4.1'
+version = '0.4.2'
 group = 'cafe.qwq'
 archivesBaseName = 'webcraft'
 
