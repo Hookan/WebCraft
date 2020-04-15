@@ -4,7 +4,7 @@ import cafe.qwq.webcraft.api.View;
 import cafe.qwq.webcraft.api.WebScreen;
 import cafe.qwq.webcraft.api.math.Vec4i;
 import com.google.gson.JsonParser;
-import net.minecraft.client.gui.screen.WorldSelectionScreen;
+import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -23,7 +23,7 @@ public class Demo
 
     public static void onGUiOpen(final GuiOpenEvent event)
     {
-        if (event.getGui() instanceof WorldSelectionScreen)
+        if (event.getGui() instanceof MainMenuScreen)
         {
             //event.setGui(new DemoScreen());
             WebScreen screen = new WebScreen(new StringTextComponent("test"));

@@ -5,9 +5,7 @@ import cafe.qwq.webcraft.WebCraft;
 import cafe.qwq.webcraft.util.FileUtils;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -195,14 +193,7 @@ public class ClientEventListener
     @SubscribeEvent
     public static void onClientSetup(final FMLClientSetupEvent event)
     {
-        consumer = ClientEventListener::onTick;
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST, consumer);
-        //WCShaders.init();
-    }
-
-    public static void onTick(final TickEvent.RenderTickEvent event)
-    {
-        MinecraftForge.EVENT_BUS.unregister(consumer);
+        WebCraft.LOGGER.info("Start loading Ultralight...");
         UltralightWindow.init();
         UltralightWindow.getInstance().makeCurrent();
         Config config = Config.getInstance();

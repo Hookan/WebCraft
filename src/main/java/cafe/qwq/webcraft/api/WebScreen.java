@@ -166,8 +166,8 @@ public class WebScreen extends Screen
         RenderSystem.popMatrix();
     }
 
-    double lastTime = 0.0;
-    int fpsSum = 0;
+    //double lastTime = 0.0;
+    //int fpsSum = 0;
 
     public void render(int mX, int mY, float pTicks)
     {
@@ -184,9 +184,9 @@ public class WebScreen extends Screen
         viewList.forEach(view -> view.draw());
         rendererList2.forEach(renderer -> renderer.render(mouseX, mouseY, pTicks));
 
-        fpsSum++;
-        double time = GLFW.glfwGetTime();
-        if (time - lastTime > 1.0)
+        //fpsSum++;
+        //double time = GLFW.glfwGetTime();
+        /*if (time - lastTime > 1.0)
         {
             //System.out.printf("FPS = %.1f\n", 1.0 * fpsSum / (time - lastTime));
             int a = (int) (1.0 * fpsSum / (time - lastTime) * 10 + 0.5);
@@ -194,7 +194,7 @@ public class WebScreen extends Screen
                     "Minecraft 1.15.2 FPS: " + a / 10 + "." + a % 10);
             lastTime = time;
             fpsSum = 0;
-        }
+        }*/
 
         RenderSystem.popMatrix();
     }
