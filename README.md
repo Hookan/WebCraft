@@ -10,9 +10,9 @@ WebCraft accomplishes the GUI-rendering system by [Ultralight](https://ultralig.
 
 Please obey WebCraft Open-Source License (LGPL) and the licenses of Ultralight.
 
-The operating system we support: Windows & Linux (We only have tested on Ubuntu, Manjaro and ArchLinux so we don't know whether it can work on other distros or not. If you test on others, please let us know)
+The operating system we support: Windows & Linux (We only have tested on Ubuntu, Manjaro and ArchLinux so we don't know whether it can work on other distros or not. If you have tested on others, please let us know)
 
-About the support for Mac OS: We have tried our best to, but we don't have any Mac OSX devices, so we gave up. If you can make it support MAC, please send a pull request.
+About the support for Mac OS: We have tried our best to offer support for Mac. However ,we gave up for the reason that we have no Mac OSX device. If you can provide support for Mac, we would appreciate for your sending a pull request.
 
 API docs are editing......
 
@@ -27,8 +27,8 @@ Plans in the future:
 
 * Provide some APIs for bukkit plugins.
 * Use Fabric instead of Forge
-* Develop a verison in Minecraft 1.12.2.
-* Separate our mod from Mod Loaders and let it be a special mod.
+* Develop a version that supports Minecraft 1.12.2.
+* Separate our mod from Mod Loaders and make it be an independent mod.
 
 ## How to install WebCraft?
 
@@ -42,11 +42,11 @@ When the first time you run this mod, it will download natives jar. It may be VE
 
 ## Get Started with WebCraft
 
-Tips: All of the `<webcraft_version>` need to be insteaded of the version of WebCraft you want. (For example, you put the version `0.3.3` into the `webcraft:<webcraft_version>` and the result is `webcraft:0.3.3`)
+Tips: All the `<webcraft_version>` needs to be replaced with the version of WebCraft you use. (For example, you may substitute the version 0.4.2 for the `webcraft:<webcraft_version>` and the version in gradle.build would look like `webcraft:0.4.2` )
 
 Firstly, download Forge MDK and set `mappings` to `mappings channel: 'snapshot', version: '20200306-1.15.1'` in `build.gradle` (you can skip this step if you still want to apply your appropriate `mappings`)
 
-Secondly, put these codes in `build.gradle` (NOT IN `buildscript`!!).
+Secondly, add these codes to `build.gradle` (NOT IN `buildscript`!!).
 
 ```groovy
 repositories {
@@ -190,7 +190,7 @@ Then add these codes to `mods.toml`:
     side="BOTH" # We will provide some APIs for server in the future.
 ```
 
-Then you can use WebCraft API in your mod.
+Finally you can use WebCraft API in your mod.
 
 ```java
 WebScreen screen = new WebScreen(new StringTextComponent("MyGui"));
@@ -231,8 +231,8 @@ Then import this project into your IDE.
 
 * Windows
 
-Install the BuildTool of VisualStudio at first.(Only need to install VC++)
+Install the BuildTool of VisualStudio at first. (You only need to install VC++)
 
-Then you need to find the path you install in and configure the environment variables. If you configure it successfully, you should  able to use the command `cl` in the command line.
+Then you need to find the path you install in and configure the environment variables. If you configure it successfully, you should be able to use the command `cl` in the command line.
 
 At last you should import this project into your IDE.
